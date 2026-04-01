@@ -6,7 +6,6 @@ import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { getPlayer } from "@/lib/player"
 import { LeaderboardTable } from "@/components/leaderboard-table"
-import { Button } from "@/components/ui/button"
 import type { LeaderboardEntry, Score } from "@/lib/types"
 
 export default function LeaderboardPage() {
@@ -66,17 +65,29 @@ export default function LeaderboardPage() {
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-12">
       <motion.h1
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="text-3xl font-bold text-foreground"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-3xl font-display text-gold-gradient tracking-wide"
       >
-        Leaderboard
+        The Ledger of Champions
       </motion.h1>
+
+      <div className="ornament-line w-full max-w-xs mt-4">
+        <span className="font-display text-primary text-xs tracking-[0.3em]">
+          &#9830; &#9830; &#9830;
+        </span>
+      </div>
+
+      <p className="mt-3 text-sm italic text-muted-foreground">
+        Ranked by knowledge of the realm
+      </p>
 
       <div className="mt-8 w-full max-w-2xl">
         {loading ? (
-          <p className="text-center text-muted-foreground">Loading...</p>
+          <p className="text-center text-muted-foreground italic">
+            Consulting the archives...
+          </p>
         ) : (
           <LeaderboardTable
             entries={entries}
@@ -85,10 +96,13 @@ export default function LeaderboardPage() {
         )}
       </div>
 
-      <div className="mt-8">
-        <Button variant="outline" onClick={() => router.push("/")}>
-          Back to Home
-        </Button>
+      <div className="mt-10">
+        <button
+          onClick={() => router.push("/")}
+          className="text-sm font-display text-[#c9a84c] hover:text-[#d4b65c] transition-colors tracking-wide cursor-pointer"
+        >
+          Return to the Hall
+        </button>
       </div>
     </main>
   )

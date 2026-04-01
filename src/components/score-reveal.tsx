@@ -75,31 +75,57 @@ export function ScoreReveal({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="flex flex-col items-center gap-6 text-center"
+      className="scroll-card glow-gold rounded-xl p-8 sm:p-12 flex flex-col items-center gap-6 text-center"
     >
-      <h2 className="text-lg font-medium text-muted-foreground">
-        {memberName}&apos;s Quiz
+      <div className="ornament">--- --- ---</div>
+
+      <h2 className="font-display text-sm uppercase tracking-widest text-muted-foreground">
+        {memberName}&apos;s Trial
       </h2>
 
-      <div className="text-7xl font-bold tabular-nums text-foreground">
+      <div className="ornament-line w-full">
+        <span className="font-display text-xs text-gold opacity-50">*</span>
+      </div>
+
+      <div className="text-gold-gradient text-8xl font-display tabular-nums leading-none py-2">
         {displayScore}/{total}
+      </div>
+
+      <div className="ornament-line w-full">
+        <span className="font-display text-xs text-gold opacity-50">*</span>
       </div>
 
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: showMessage ? 1 : 0 }}
         transition={{ duration: 0.5 }}
-        className="text-lg text-muted-foreground max-w-sm"
+        className={`font-sans text-lg text-muted-foreground max-w-sm leading-relaxed ${showMessage ? "ink-text" : ""}`}
       >
         {message}
       </motion.p>
 
-      <div className="flex gap-3 mt-4">
-        <Button variant="outline" onClick={onHome}>
-          Back to Home
-        </Button>
-        <Button onClick={onLeaderboard}>View Leaderboard</Button>
+      <div className="ornament-line w-full mt-2">
+        <span className="font-display text-xs text-gold opacity-50">*</span>
       </div>
+
+      <div className="flex gap-3 mt-2">
+        <Button
+          variant="outline"
+          className="font-display text-xs uppercase tracking-wider border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+          onClick={onHome}
+        >
+          Return to the Hall
+        </Button>
+        <Button
+          variant="outline"
+          className="font-display text-xs uppercase tracking-wider border-gold/30 text-gold hover:bg-gold/10 hover:border-gold/50"
+          onClick={onLeaderboard}
+        >
+          View the Leaderboard
+        </Button>
+      </div>
+
+      <div className="ornament">--- --- ---</div>
     </motion.div>
   )
 }

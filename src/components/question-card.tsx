@@ -13,7 +13,7 @@ interface QuestionCardProps {
   accentColor: string
 }
 
-const OPTION_LABELS = ["A", "B", "C", "D"] as const
+const ROMAN_NUMERALS = ["I", "II", "III", "IV"] as const
 
 export function QuestionCard({
   question,
@@ -54,8 +54,8 @@ export function QuestionCard({
   }
 
   return (
-    <div className="w-full space-y-4">
-      <h2 className="text-xl font-semibold text-foreground">
+    <div className="w-full space-y-6">
+      <h2 className="font-display text-lg font-medium text-foreground leading-relaxed">
         {question.question_text}
       </h2>
       <div className="flex flex-col gap-3">
@@ -72,15 +72,15 @@ export function QuestionCard({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left h-auto py-3 px-4 text-sm",
-                  isAnswering && "cursor-pointer",
+                  "w-full justify-start text-left h-auto py-3.5 px-4 text-sm font-sans border-border/50 transition-all duration-200",
+                  isAnswering && "cursor-pointer hover:border-gold/40",
                   state === "correct-selected" &&
-                    "bg-green-500 border-green-500 text-white hover:bg-green-500 hover:text-white",
+                    "bg-emerald-800/60 border-emerald-600 text-emerald-100 hover:bg-emerald-800/60 hover:text-emerald-100",
                   state === "incorrect-selected" &&
-                    "bg-red-500 border-red-500 text-white hover:bg-red-500 hover:text-white",
+                    "bg-crimson/40 border-crimson text-red-200 hover:bg-crimson/40 hover:text-red-200",
                   state === "correct-unselected" &&
-                    "border-green-500 border-2 text-green-600",
-                  state === "other" && "opacity-50"
+                    "border-emerald-600/70 border-2 text-emerald-300",
+                  state === "other" && "opacity-40"
                 )}
                 style={
                   isAnswering
@@ -106,8 +106,8 @@ export function QuestionCard({
                 disabled={isFeedback}
                 onClick={() => isAnswering && onAnswer(index)}
               >
-                <span className="font-semibold mr-2">
-                  {OPTION_LABELS[index]}.
+                <span className="font-display text-xs tracking-wider text-gold opacity-70 mr-3 min-w-[1.5rem]">
+                  {ROMAN_NUMERALS[index]}
                 </span>
                 {option}
               </Button>

@@ -130,7 +130,9 @@ export default function QuizPage({
   if (loading) {
     return (
       <main className="flex flex-1 items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground italic">
+          The scrolls are being retrieved...
+        </p>
       </main>
     )
   }
@@ -140,7 +142,7 @@ export default function QuizPage({
       <main className="flex flex-1 flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Member not found.</p>
         <Button variant="outline" onClick={() => router.push("/")}>
-          Back to Home
+          Return to the Hall
         </Button>
       </main>
     )
@@ -148,15 +150,15 @@ export default function QuizPage({
 
   if (questions.length === 0) {
     return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-4">
-        <p className="text-xl font-semibold text-foreground">
-          Questions not submitted yet!
+      <main className="flex flex-1 flex-col items-center justify-center gap-6">
+        <p className="text-xl font-display text-foreground">
+          The scrolls remain unwritten.
         </p>
-        <p className="text-muted-foreground">
-          {member.name} hasn&apos;t added their questions yet. Check back later.
+        <p className="text-muted-foreground italic">
+          {member.name} has not yet inscribed their questions.
         </p>
         <Button variant="outline" onClick={() => router.push("/")}>
-          Back to Home
+          Return to the Hall
         </Button>
       </main>
     )
@@ -183,18 +185,18 @@ export default function QuizPage({
       <div className="w-full max-w-lg space-y-8">
         <div className="flex items-center justify-between">
           <h1
-            className="text-xl font-bold"
+            className="text-xl font-display tracking-wide"
             style={{ color: member.color }}
           >
-            {member.name}&apos;s Quiz
+            {member.name}&apos;s Trial
           </h1>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push("/")}
-            className="text-muted-foreground"
+            className="text-muted-foreground hover:text-foreground"
           >
-            Quit
+            Abandon
           </Button>
         </div>
 
@@ -204,34 +206,36 @@ export default function QuizPage({
           color={member.color}
         />
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQuestion}
-            initial={{ x: 300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -300, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <QuestionCard
-              question={{
-                ...question,
-                correct_index: correctIndex ?? -1,
-                updated_at: "",
-                created_at: "",
-              }}
-              onAnswer={handleAnswer}
-              phase={phase}
-              selectedIndex={selectedAnswer}
-              accentColor={member.color}
-            />
-          </motion.div>
-        </AnimatePresence>
+        <div className="scroll-card rounded-lg p-6 glow-gold">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestion}
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <QuestionCard
+                question={{
+                  ...question,
+                  correct_index: correctIndex ?? -1,
+                  updated_at: "",
+                  created_at: "",
+                }}
+                onAnswer={handleAnswer}
+                phase={phase}
+                selectedIndex={selectedAnswer}
+                accentColor={member.color}
+              />
+            </motion.div>
+          </AnimatePresence>
 
-        {checking && (
-          <p className="text-center text-sm text-muted-foreground">
-            Checking...
-          </p>
-        )}
+          {checking && (
+            <p className="text-center text-sm text-muted-foreground italic mt-4">
+              The council deliberates...
+            </p>
+          )}
+        </div>
       </div>
     </main>
   )

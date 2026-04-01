@@ -27,11 +27,19 @@ const CATEGORIES = [
 ]
 
 const CATEGORY_HINTS: Record<number, string> = {
-  1: 'Try a college memory -- e.g. "What happened at the 2023 tailgate?"',
-  2: 'Try a current interest -- e.g. "What show am I binge-watching right now?"',
-  3: 'Try a hobby -- e.g. "What do I do every Saturday morning?"',
-  4: 'Try a preference -- e.g. "What\'s my go-to Chipotle order?"',
-  5: 'Try a quirk -- e.g. "What\'s my most annoying habit?"',
+  1: 'Inscribe a college memory -- "What befell us at the 2023 tailgate?"',
+  2: 'Inscribe a current interest -- "What spectacle am I watching of late?"',
+  3: 'Inscribe a hobby -- "What pursuit occupies my Saturday mornings?"',
+  4: 'Inscribe a preference -- "What is my customary order at Chipotle?"',
+  5: 'Inscribe a quirk -- "What habit of mine vexes the household most?"',
+}
+
+const SCROLL_LABELS: Record<number, string> = {
+  1: "Scroll I",
+  2: "Scroll II",
+  3: "Scroll III",
+  4: "Scroll IV",
+  5: "Scroll V",
 }
 
 export default function AdminPage() {
@@ -78,7 +86,7 @@ export default function AdminPage() {
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedMemberId) {
-      setError("Select your name first.")
+      setError("Select thy name first.")
       return
     }
     setVerifying(true)
@@ -98,10 +106,10 @@ export default function AdminPage() {
         sessionStorage.setItem(SESSION_PW_KEY, password)
         setAuthenticated(true)
       } else {
-        setError("Wrong password for this member.")
+        setError("The password doth not match. Try again.")
       }
     } catch {
-      setError("Failed to verify. Please try again.")
+      setError("Verification failed. Pray, try once more.")
     } finally {
       setVerifying(false)
     }
@@ -130,22 +138,26 @@ export default function AdminPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center px-4 py-12">
-      <h1 className="text-3xl font-bold text-foreground">The Round Table</h1>
+      <h1 className="text-3xl font-display text-gold-gradient tracking-wide">
+        The Round Table
+      </h1>
 
-      <div className="mt-4 w-full max-w-xl rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-center text-sm text-amber-400">
+      <div className="mt-6 w-full max-w-xl scroll-card rounded-lg border-[#8b2942]/30 bg-[#8b2942]/10 p-4 text-center text-sm text-[#d4636e]">
         ONLY edit your own questions. Cheating will result in being blood eagled.
       </div>
 
       {!authenticated ? (
-        <Card className="mt-8 w-full max-w-md">
+        <Card className="mt-8 w-full max-w-md scroll-card glow-gold border-[#c9a84c]/15">
           <CardHeader>
-            <CardTitle>Identify Yourself, Knight</CardTitle>
+            <CardTitle className="font-display text-xl tracking-wide text-foreground">
+              Identify Thyself, Knight
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleVerify} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Who are you?
+                  Who art thou?
                 </label>
                 <Select
                   value={selectedMemberId}
@@ -155,7 +167,7 @@ export default function AdminPage() {
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select your name" />
+                    <SelectValue placeholder="Select thy name" />
                   </SelectTrigger>
                   <SelectContent>
                     {members.map((member) => (
@@ -168,11 +180,11 @@ export default function AdminPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Your password
+                  Thy password
                 </label>
                 <Input
                   type="password"
-                  placeholder="Enter your personal password"
+                  placeholder="Speak the secret word"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value)
@@ -190,26 +202,26 @@ export default function AdminPage() {
       ) : (
         <div className="mt-8 w-full max-w-xl space-y-6">
           <div className="flex items-center justify-between">
-            <p className="text-lg font-medium text-foreground">
+            <p className="text-lg font-display tracking-wide text-foreground">
               Editing as{" "}
-              <span style={{ color: selectedMember?.color }}>
+              <span className="font-bold" style={{ color: selectedMember?.color }}>
                 {selectedMember?.name}
               </span>
             </p>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Log out
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
+              Depart
             </Button>
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm font-medium text-foreground mb-2">
+          <div className="scroll-card rounded-lg p-4">
+            <p className="text-sm font-display tracking-wide text-foreground mb-3">
               Suggested categories:
             </p>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
                 <span
                   key={cat}
-                  className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+                  className="rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/20 px-3 py-1 text-xs text-[#c9a84c]/80"
                 >
                   {cat}
                 </span>
@@ -219,13 +231,13 @@ export default function AdminPage() {
 
           <div className="space-y-6">
             {[1, 2, 3, 4, 5].map((slot) => (
-              <Card key={slot}>
+              <Card key={slot} className="scroll-card glow-gold-hover border-[#c9a84c]/10">
                 <CardHeader>
-                  <CardTitle className="text-lg">
-                    Question {slot}
+                  <CardTitle className="text-lg font-display tracking-wide">
+                    {SCROLL_LABELS[slot]}
                     {getQuestionForSlot(slot) && (
-                      <span className="ml-2 text-xs text-green-500">
-                        (saved)
+                      <span className="ml-2 text-xs text-[#c9a84c]/70 font-sans italic">
+                        (inscribed)
                       </span>
                     )}
                   </CardTitle>

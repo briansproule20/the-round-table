@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { getPlayer, setPlayerName } from "@/lib/player"
 import { supabase } from "@/lib/supabase"
@@ -15,7 +16,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 }
@@ -92,15 +93,16 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-12">
+    <main className="flex flex-1 flex-col items-center px-4 py-16">
       <NamePromptDialog open={needsName} onComplete={handleNameComplete} />
 
+      {/* Player name - top right */}
       {player && (
         <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
           {editingName ? (
             <div className="flex items-center gap-2">
               <input
-                className="rounded border border-input bg-transparent px-2 py-1 text-sm text-foreground"
+                className="rounded border border-gold/25 bg-background/80 px-2.5 py-1 text-sm text-foreground font-sans placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-gold/40"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 autoFocus
@@ -109,7 +111,11 @@ export default function HomePage() {
                   if (e.key === "Escape") setEditingName(false)
                 }}
               />
-              <Button size="sm" onClick={handleSaveName}>
+              <Button
+                size="sm"
+                onClick={handleSaveName}
+                className="font-display text-xs tracking-wider bg-primary text-primary-foreground hover:bg-primary/90"
+              >
                 Save
               </Button>
             </div>
@@ -119,7 +125,7 @@ export default function HomePage() {
                 setNewName(player.name)
                 setEditingName(true)
               }}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="font-display text-sm tracking-wide text-gold/70 hover:text-gold transition-colors"
             >
               {player.name}
             </button>
@@ -127,30 +133,53 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="text-4xl sm:text-5xl font-bold text-foreground text-center"
+        className="font-display text-4xl sm:text-5xl lg:text-6xl text-gold-gradient text-center tracking-wide"
       >
         The Camelot Quiz
       </motion.h1>
 
+      {/* Ornament line below title */}
+      <motion.div
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="ornament-line mt-5 w-48"
+        aria-hidden="true"
+      />
+
+      {/* Subtitle */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.6 }}
-        className="mt-3 text-lg text-muted-foreground text-center"
+        className="mt-4 text-lg italic text-muted-foreground text-center"
       >
-        How well do you really know each other?
+        How well dost thou know thy brethren?
       </motion.p>
 
+      {/* Ornamental symbol */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="ornament mt-4"
+        aria-hidden="true"
+      >
+        &#x2014;&#x2014;&#x2014; &#x2726; &#x2014;&#x2014;&#x2014;
+      </motion.div>
+
+      {/* Member grid */}
       {loaded && (
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="mt-10 grid w-full max-w-2xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+          className="mt-10 grid w-full max-w-3xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
         >
           {members.map((member) => (
             <motion.div key={member.id} variants={itemVariants}>
@@ -164,16 +193,20 @@ export default function HomePage() {
         </motion.div>
       )}
 
+      {/* Leaderboard link */}
       {loaded && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
-          className="mt-10"
+          className="mt-12"
         >
-          <Button variant="outline" onClick={() => router.push("/leaderboard")}>
-            View Leaderboard
-          </Button>
+          <Link
+            href="/leaderboard"
+            className="font-display text-sm tracking-wider text-gold/70 hover:text-gold transition-colors underline underline-offset-4 decoration-gold/20 hover:decoration-gold/50"
+          >
+            View the Leaderboard
+          </Link>
         </motion.div>
       )}
     </main>
