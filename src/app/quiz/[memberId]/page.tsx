@@ -9,7 +9,16 @@ import { ProgressBar } from "@/components/progress-bar"
 import { QuestionCard } from "@/components/question-card"
 import { ScoreReveal } from "@/components/score-reveal"
 import { Button } from "@/components/ui/button"
-import type { Member, Question, Player } from "@/lib/types"
+import type { Member, Player } from "@/lib/types"
+
+// Quiz-safe question type -- no correct_index on the client
+interface QuizQuestion {
+  id: string
+  member_id: string
+  question_text: string
+  options: string[]
+  order: number
+}
 
 export default function QuizPage({
   params,
@@ -21,16 +30,18 @@ export default function QuizPage({
 
   const [player, setPlayer] = useState<Player | null>(null)
   const [member, setMember] = useState<Member | null>(null)
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [loading, setLoading] = useState(true)
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [correctIndex, setCorrectIndex] = useState<number | null>(null)
   const [answers, setAnswers] = useState<number[]>([])
   const [phase, setPhase] = useState<"answering" | "feedback" | "complete">(
     "answering"
   )
   const [score, setScore] = useState(0)
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     const p = getPlayer()
@@ -41,26 +52,16 @@ export default function QuizPage({
     setPlayer(p)
 
     async function loadQuiz() {
-      const { data: memberData } = await supabase
-        .from("members")
-        .select("*")
-        .eq("slug", memberId)
-        .single()
-
-      if (!memberData) {
+      // Fetch questions via server API -- correct_index is NEVER sent to client
+      const response = await fetch(`/api/quiz/questions?slug=${memberId}`)
+      if (!response.ok) {
         setLoading(false)
         return
       }
 
-      setMember(memberData)
-
-      const { data: questionsData } = await supabase
-        .from("questions")
-        .select("*")
-        .eq("member_id", memberData.id)
-        .order("order")
-
-      setQuestions(questionsData ?? [])
+      const data = await response.json()
+      setMember(data.member)
+      setQuestions(data.questions)
       setLoading(false)
     }
 
@@ -68,27 +69,37 @@ export default function QuizPage({
   }, [memberId, router])
 
   const handleAnswer = useCallback(
-    (index: number) => {
-      if (phase !== "answering") return
+    async (index: number) => {
+      if (phase !== "answering" || checking) return
+
       setSelectedAnswer(index)
+      setChecking(true)
+
+      // Ask the server if the answer is correct
+      const response = await fetch("/api/quiz/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question_id: questions[currentQuestion].id,
+          selected_index: index,
+        }),
+      })
+
+      const result = await response.json()
+      setCorrectIndex(result.correct_index)
       setPhase("feedback")
+      setChecking(false)
 
       const newAnswers = [...answers, index]
       setAnswers(newAnswers)
 
+      const newScore = result.correct ? score + 1 : score
+      if (result.correct) setScore(newScore)
+
       setTimeout(() => {
         const nextQuestion = currentQuestion + 1
         if (nextQuestion >= questions.length) {
-          // Calculate score and complete
-          let totalScore = 0
-          for (let i = 0; i < newAnswers.length; i++) {
-            if (newAnswers[i] === questions[i].correct_index) {
-              totalScore++
-            }
-          }
-          setScore(totalScore)
-
-          // Upsert score to supabase
+          // Submit final score to supabase
           if (player && member) {
             supabase
               .from("scores")
@@ -97,23 +108,23 @@ export default function QuizPage({
                   player_id: player.id,
                   player_name: player.name,
                   member_id: member.id,
-                  score: totalScore,
+                  score: newScore,
                   answers: newAnswers,
                 },
                 { onConflict: "player_id,member_id" }
               )
               .then(() => {})
           }
-
           setPhase("complete")
         } else {
           setCurrentQuestion(nextQuestion)
           setSelectedAnswer(null)
+          setCorrectIndex(null)
           setPhase("answering")
         }
       }, 2000)
     },
-    [phase, answers, currentQuestion, questions, player, member]
+    [phase, checking, answers, currentQuestion, questions, player, member, score]
   )
 
   if (loading) {
@@ -202,7 +213,12 @@ export default function QuizPage({
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <QuestionCard
-              question={question}
+              question={{
+                ...question,
+                correct_index: correctIndex ?? -1,
+                updated_at: "",
+                created_at: "",
+              }}
               onAnswer={handleAnswer}
               phase={phase}
               selectedIndex={selectedAnswer}
@@ -210,6 +226,12 @@ export default function QuizPage({
             />
           </motion.div>
         </AnimatePresence>
+
+        {checking && (
+          <p className="text-center text-sm text-muted-foreground">
+            Checking...
+          </p>
+        )}
       </div>
     </main>
   )
