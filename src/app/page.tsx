@@ -193,19 +193,26 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Leaderboard link */}
+      {/* Navigation links */}
       {loaded && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
-          className="mt-12"
+          className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:gap-8"
         >
           <Link
             href="/leaderboard"
             className="font-display text-sm tracking-wider text-gold/70 hover:text-gold transition-colors underline underline-offset-4 decoration-gold/20 hover:decoration-gold/50"
           >
-            View the Leaderboard
+            The Ledger of Champions
+          </Link>
+          <span className="hidden sm:inline text-gold/30" aria-hidden="true">&#x2726;</span>
+          <Link
+            href="/admin"
+            className="font-display text-sm tracking-wider text-gold/70 hover:text-gold transition-colors underline underline-offset-4 decoration-gold/20 hover:decoration-gold/50"
+          >
+            Submit Thy Questions
           </Link>
         </motion.div>
       )}
